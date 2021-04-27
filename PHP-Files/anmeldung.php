@@ -1,13 +1,20 @@
 <?php
 
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && empty($error)&& isset($_POST['uname']) && isset($_POST['psw'])){
+if ($_SERVER["REQUEST_METHOD"] == "POST" && empty($error)&& isset($_POST['uname'])&&isset($_POST["secret"]) && isset($_POST['psw'])){
   $error = '';
 
 
   if(!empty(trim($_POST['uname']))){
 
     $uname = trim($_POST['uname']);
+
+  } else {
+    $error .= "Geben Sie bitte den Benutzername an.<br />";
+  }
+
+  if(!empty(trim($_POST['secret']))){
+
+    $secret = trim($_POST['secret']);
 
   } else {
     $error .= "Geben Sie bitte den Benutzername an.<br />";
@@ -24,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && empty($error)&& isset($_POST['uname'
   // kein fehler
   if(empty($error)){
     // query
-    $query = "SELECT ID, name, email , password, rechte, paied from tbl_user where email = ?";
+    $query = "SELECT ID, name, email , password,secret, rechte, paied from tbl_user where email = ?";
     // query vorbereiten
     $stmt = $mysqli->prepare($query);
     if($stmt===false){
@@ -48,7 +55,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && empty($error)&& isset($_POST['uname'
       // passwort prüfen
 
 
+
       if(password_verify($psw, $row['password'])&&isset($uname)&&isset($psw)){
+        $ga = new PHPGangsta_GoogleAuthenticator();
+        $qrCodeUrl = $ga->getQRCodeGoogleUrl('WWEreignisse', $row["secret"]);
+        $oneCode = $ga->getCode($row["secret"]);
+
+
+
+        if($secret == $oneCode){
 
         $_SESSION["name"]=$row["name"];
         $_SESSION["rechte"] =$row["rechte"];
@@ -58,6 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && empty($error)&& isset($_POST['uname'
         $_SESSION["message"] = "you are logged-in";
         $uname = $psw = '';
     }
+  }
   }
 }
 

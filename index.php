@@ -15,8 +15,9 @@ $mysqli = new mysqli($host, $usernameAnmeldung,$anmeldungpassword, $database);
 if ($mysqli->connect_error) {
 die('Connect Error (' . $mysqli->connect_error . ') '. $mysqli->connect_error);
 }
-
+require_once 'vendor\phpgangsta\googleauthenticator\PHPGangsta/GoogleAuthenticator.php';
 include("PHP-Files/anmeldung.php");
+
  ?>
 
 <head>
@@ -47,7 +48,7 @@ http://www.templatemo.com/tm-514-magazee
 </head>
 
 <body>
-  <!-- Loader -->
+    <!-- Loader -->
   <div id="loader-wrapper">
     <div id="loader"></div>
     <div class="loader-section section-left"></div>
@@ -98,7 +99,7 @@ http://www.templatemo.com/tm-514-magazee
     $resultevents = $stmtevents->get_result();
 
     while($row = $resultevents->fetch_assoc()){
-      if($row["ID_user"]==$_SESSION["ID"]){
+      if(isset($_SESSION["ID"])&&$row["ID_user"]==$_SESSION["ID"]){
         echo '
         <section class="row tm-section">
           <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6">
@@ -144,7 +145,8 @@ http://www.templatemo.com/tm-514-magazee
 
       }echo'</div>
           </div>
-      </section>';
+
+      </section>';//echo $_SESSION['USERID'];
     }}
 ?>
 
@@ -163,6 +165,9 @@ http://www.templatemo.com/tm-514-magazee
           <label for="psw"><b>Password:</b></label><br>
           <input class="form-control" type="password" placeholder="Enter Password" name="psw" required>
           <br>
+          <label for="secret"><b>2-Step:</b></label><br>
+          <input class="form-control" type="number" placeholder="Enter 2-Step" name="secret" required>
+          <br>
           <button class="btn btn-primary" type="submit">Login</button>
           <br>
         </form>
@@ -170,6 +175,7 @@ http://www.templatemo.com/tm-514-magazee
       </div>
 
     </div>
+
 
   </div>
   <!-- 6th Section -->
@@ -203,6 +209,7 @@ http://www.templatemo.com/tm-514-magazee
         <div class="col-xs-12 mt-4 tm-center">
           <button type="submit" class="btn btn-primary" name="register_submit">register</button>
         </div>
+
       </form>
     </div>
     <div class="col-lg-12 tm-bg-color-gray tm-text-color-white tm-font-thin tm-form-footer">
